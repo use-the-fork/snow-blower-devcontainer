@@ -1,0 +1,14 @@
+services:
+  devcontainer:
+    build:
+      context: ./
+      dockerfile: ./Dockerfile
+    volumes:
+      - ..:/workspace:cached
+      - nix:/nix
+      - /var/run/docker.sock:/var/run/docker.sock
+    security_opt:
+      - label:disable
+
+volumes:
+  nix:
