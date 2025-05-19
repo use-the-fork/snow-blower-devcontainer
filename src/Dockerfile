@@ -48,11 +48,6 @@ RUN groupadd --gid ${USER_GID} ${USERNAME} && \
  # copy nix configuration
 COPY etc/nix.conf /etc/nix/nix.conf
 
-
-
-
-
-########################## from here.
 # install nix
 ARG NIX_INSTALL_SCRIPT=https://nixos.org/nix/install
 RUN curl -L ${NIX_INSTALL_SCRIPT} | sudo -u ${USERNAME} NIX_INSTALLER_NO_MODIFY_PROFILE=1 sh
@@ -71,7 +66,7 @@ ENV ENV="/etc/envrc" BASH_ENV="/etc/envrc"
 COPY etc/direnv.toml /etc
 ENV DIRENV_CONFIG=/etc
 
-COPY --from=ext-preloader /ext-preloader /usr/bin/ext-preloader
+# COPY --from=ext-preloader /ext-preloader /usr/bin/ext-preloader
 COPY docker-entrypoint.sh /docker-entrypoint.sh
 
 # set defaut user, can be changed via ONBUILD triggers
