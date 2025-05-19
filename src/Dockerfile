@@ -50,7 +50,8 @@ COPY etc/nix.conf /etc/nix/nix.conf
 
 # install nix
 ARG NIX_INSTALL_SCRIPT=https://nixos.org/nix/install
-RUN curl -L ${NIX_INSTALL_SCRIPT} | sudo -u ${USERNAME} NIX_INSTALLER_NO_MODIFY_PROFILE=1 sh
+RUN curl -L ${NIX_INSTALL_SCRIPT} | sudo -u ${USERNAME} NIX_INSTALLER_NO_MODIFY_PROFILE=1 sh && \
+    sudo -u ${USERNAME} nix run home-manager/master -- -b bak init --switch --flake "/home/jscherrer/.config/home-manager#jscherrer"
 
 # install devcontainer extra profile that loads nix and has vscode user env probe
 COPY etc/devcontainer.sh /etc/profile.d/devcontainer.sh
