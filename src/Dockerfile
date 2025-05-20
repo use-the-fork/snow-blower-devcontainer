@@ -56,6 +56,9 @@ RUN curl -L ${NIX_INSTALL_SCRIPT} | sudo -u ${USERNAME} NIX_INSTALLER_NO_MODIFY_
 RUN sudo -u ${USERNAME} nix-channel --add https://nixos.org/channels/nixpkgs-unstable unstable && \
     sudo -u ${USERNAME} nix-channel --update
 
+# Install zsh and starship via Nix
+RUN sudo -u ${USERNAME} nix-env -iA nixpkgs.zsh nixpkgs.starship
+
 # install devcontainer extra profile that loads nix and has vscode user env probe
 COPY etc/devcontainer.sh /etc/profile.d/devcontainer.sh
 
