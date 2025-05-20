@@ -52,6 +52,10 @@ COPY etc/nix.conf /etc/nix/nix.conf
 ARG NIX_INSTALL_SCRIPT=https://nixos.org/nix/install
 RUN curl -L ${NIX_INSTALL_SCRIPT} | sudo -u ${USERNAME} NIX_INSTALLER_NO_MODIFY_PROFILE=1 sh
 
+# Add unstable channel
+RUN sudo -u ${USERNAME} nix-channel --add https://nixos.org/channels/nixpkgs-unstable unstable && \
+    sudo -u ${USERNAME} nix-channel --update
+
 # install devcontainer extra profile that loads nix and has vscode user env probe
 COPY etc/devcontainer.sh /etc/profile.d/devcontainer.sh
 
