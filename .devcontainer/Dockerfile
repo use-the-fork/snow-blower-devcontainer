@@ -1,4 +1,4 @@
-FROM ghcr.io/xtruder/nix-devcontainer:v1
+FROM docker.io/use-the-fork/snow-blower-devcontainer:latest 
 
 # cache /nix
 VOLUME /nix

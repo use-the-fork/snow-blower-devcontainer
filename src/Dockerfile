@@ -89,8 +89,10 @@ COPY etc/dots /home/${USERNAME}/.config/dots
 RUN mkdir -p /home/${USERNAME}/.config && \
     cd /home/${USERNAME}/.config/dots && \
     source ~/.nix-profile/etc/profile.d/nix.sh && \
-    nix build && \
+    nix --experimental-features "nix-command flakes" build && \
+    mkdir -p /home/${USERNAME}/.config && \
     cp result/starship.toml /home/${USERNAME}/.config/starship.toml && \
+    rm -f result && \
     chown -R ${USERNAME}:${USERNAME} /home/${USERNAME}/.config
 
 # Create zsh config
