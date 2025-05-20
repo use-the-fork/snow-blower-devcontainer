@@ -84,6 +84,34 @@ RUN echo "source ~/.nix-profile/etc/profile.d/nix.sh" >> ~/.profile && \
 # Install zsh and starship via Nix
 RUN nix-env -iA nixpkgs.zsh nixpkgs.starship
 
+# Setup starship configuration using flake
+COPY etc/dots /home/${USERNAME}/.config/dots
+RUN mkdir -p /home/${USERNAME}/.config && \
+    cd /home/${USERNAME}/.config/dots && \
+    source ~/.nix-profile/etc/profile.d/nix.sh && \
+    nix build && \
+    cp result/starship.toml /home/${USERNAME}/.config/starship.toml && \
+    chown -R ${USERNAME}:${USERNAME} /home/${USERNAME}/.config
+
+# Create zsh config
+RUN echo '# Load Nix environment\n\
+if [ -e $HOME/.nix-profile/etc/profile.d/nix.sh ] ; then\n\
+    . $HOME/.nix-profile/etc/profile.d/nix.sh\n\
+fi\n\
+\n\
+# Initialize direnv\n\
+eval "$(direnv hook zsh)"\n\
+\n\
+# Initialize Starship prompt\n\
+eval "$(starship init zsh)"\n\
+\n\
+# Basic Zsh configuration\n\
+HISTFILE=~/.zsh_history\n\
+HISTSIZE=10000\n\
+SAVEHIST=10000\n\
+setopt appendhistory' > /home/${USERNAME}/.zshrc && \
+    chown ${USERNAME}:${USERNAME} /home/${USERNAME}/.zshrc
+
 ENTRYPOINT [ "/docker-entrypoint.sh" ]
 
 ONBUILD USER root
