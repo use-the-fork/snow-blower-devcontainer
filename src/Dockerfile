@@ -52,13 +52,6 @@ COPY etc/nix.conf /etc/nix/nix.conf
 ARG NIX_INSTALL_SCRIPT=https://nixos.org/nix/install
 RUN curl -L ${NIX_INSTALL_SCRIPT} | sudo -u ${USERNAME} NIX_INSTALLER_NO_MODIFY_PROFILE=1 sh
 
-# Add unstable channel
-RUN sudo -u ${USERNAME} nix-channel --add https://nixos.org/channels/nixpkgs-unstable unstable && \
-    sudo -u ${USERNAME} nix-channel --update
-
-# Install zsh and starship via Nix
-RUN sudo -u ${USERNAME} nix-env -iA nixpkgs.zsh nixpkgs.starship
-
 # install devcontainer extra profile that loads nix and has vscode user env probe
 COPY etc/devcontainer.sh /etc/profile.d/devcontainer.sh
 
@@ -78,6 +71,19 @@ COPY docker-entrypoint.sh /docker-entrypoint.sh
 
 # set defaut user, can be changed via ONBUILD triggers
 USER ${USERNAME}
+
+
+# Add unstable channel
+RUN source ~/.nix-profile/etc/profile.d/nix.sh && \
+    nix-channel --add https://nixos.org/channels/nixpkgs-unstable unstable && \
+    nix-channel --update
+
+RUN echo "source ~/.nix-profile/etc/profile.d/nix.sh" >> ~/.profile && \
+    echo "source ~/.nix-profile/etc/profile.d/nix.sh" >> ~/.bashrc
+
+# Install zsh and starship via Nix
+RUN nix-env -iA nixpkgs.zsh nixpkgs.starship
+
 ENTRYPOINT [ "/docker-entrypoint.sh" ]
 
 ONBUILD USER root
