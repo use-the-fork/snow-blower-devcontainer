@@ -1,26 +1,36 @@
 {                                                                                                    
-  description = "Starship prompt configuration";                                                     
+  description = "Snowblower devcontainer";                                                     
                                                                                                      
-  inputs = {                                                                                         
+  inputs = {        
+    # global, so they can be `.follow`ed
+    systems.url = "github:nix-systems/default-linux";
+    
     nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
 
-    flake-parts = {
-      url = "github:hercules-ci/flake-parts";
-      inputs.nixpkgs-lib.follows = "nixpkgs";
-    };                                      
+    home-manager = {
+      url = "github:nix-community/home-manager";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
+
+    # Powered by
+    flake-utils.url = "github:numtide/flake-utils";
+
   };                                                                                                 
 
+  outputs = inputs@{self, nixpkgs, flake-utils, home-manager, ...}:
+    flake-utils.lib.eachDefaultSystem (system: 
+    let 
+        pkgs = import nixpkgs { inherit system; };
+    in {
+        legacyPackages = {
+            homeConfigurations = {
+                "code" = home-manager.lib.homeManagerConfiguration {
+                    inherit pkgs;
 
-  outputs = inputs:
-    inputs.flake-parts.lib.mkFlake {inherit inputs;} {
-      systems = [ "x86_64-linux" "aarch64-linux" ];
-
-      perSystem = { config, self', inputs', pkgs, system, ... }: {
-        packages.default = import ./shell/starship.nix { 
-          inherit pkgs; 
-          lib = pkgs.lib;
+                    modules = [ ./home ]; # Defined later
+                };
+            };
         };
-      };
-    };                                                                                             
-}   
-
+    });
+}

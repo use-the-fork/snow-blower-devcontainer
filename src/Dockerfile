@@ -1,138 +1,45 @@
-FROM docker.io/debian:stable-slim
+FROM docker.io/ubuntu:latest
 
-# change build shell to /bin/bash, so env will be set correctly
-SHELL ["/bin/bash", "-c"]
+ARG DEBIAN_FRONTEND=noninteractive
 
-# make /bin/sh symlink to bash instead of dash:
-RUN echo "dash dash/sh boolean false" | debconf-set-selections
-RUN DEBIAN_FRONTEND=noninteractive dpkg-reconfigure dash
+RUN apt-get update -y && \
+    apt-get install -y curl locales sudo && \
+    rm -rf /var/lib/apt/lists/*
 
-# update and install base packages
-RUN apt update -y
-RUN apt -y install --no-install-recommends \
-    sudo \
-    ca-certificates \
-    psmisc \
-    procps \
-    less \
-    xz-utils \
-    vim-tiny \
-    nano \
-    curl \
-    git \
-    ssh \
-    direnv \
-    gnupg2 \
-    iproute2 \
-    inetutils-ping \
-    rsync \
-    lsb-release \
-    dialog \
-    locales \
-    man-db \
-    bash-completion \
-    acl
+RUN useradd -m -U sykloid
+RUN echo "sykloid ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
 
-# create at least locae for en_US.UTF-8
-RUN echo "en_US.UTF-8 UTF-8" >> /etc/locale.gen && locale-gen
+RUN sed -i '/en_US.UTF-8/s/^# //g' /etc/locale.gen && locale-gen
+RUN dpkg-reconfigure --frontend=noninteractive locales && update-locale LANG=en_US.UTF-8
+ENV LC_ALL=en_US.UTF-8
+ENV LOCALE_ARCHIVE=/usr/lib/locale/locale-archive
+
+RUN curl --proto '=https' --tlsv1.2 -sSf -L https://install.determinate.systems/nix | \
+  sh -s -- install linux \
+  --extra-conf "sandbox = false" \
+  --extra-conf "filter-syscalls = false" \
+  --init none \
+  --no-confirm
+ENV PATH="${PATH}:/nix/var/nix/profiles/default/bin"
 
 # create non-root user and group and add it sudoers
 ARG USERNAME=code
 ARG USER_UID=1000
 ARG USER_GID=${USER_UID}
-RUN groupadd --gid ${USER_GID} ${USERNAME} && \
-    useradd --uid ${USER_UID} --gid ${USER_GID} -m ${USERNAME} -s /bin/bash && \
-    echo $USERNAME ALL=\(root\) NOPASSWD:ALL > /etc/sudoers.d/devcontainer && \
-    chmod 0440 /etc/sudoers.d/devcontainer
 
- # copy nix configuration
-COPY etc/nix.conf /etc/nix/nix.conf
-
-# install nix
-ARG NIX_INSTALL_SCRIPT=https://nixos.org/nix/install
-RUN curl -L ${NIX_INSTALL_SCRIPT} | sudo -u ${USERNAME} NIX_INSTALLER_NO_MODIFY_PROFILE=1 sh
-
-# install devcontainer extra profile that loads nix and has vscode user env probe
-COPY etc/devcontainer.sh /etc/profile.d/devcontainer.sh
-
-# install bash config
-COPY etc/bash.bashrc /etc/bash.bashrc
-
-# set env for non interactve shell to load nix
-COPY etc/envrc /etc/envrc
-ENV ENV="/etc/envrc" BASH_ENV="/etc/envrc"
-
-# copy direnv config and set conig path
-COPY etc/direnv.toml /etc
-ENV DIRENV_CONFIG=/etc
-
-# COPY --from=ext-preloader /ext-preloader /usr/bin/ext-preloader
-COPY docker-entrypoint.sh /docker-entrypoint.sh
-
-# set defaut user, can be changed via ONBUILD triggers
 USER ${USERNAME}
+ENV USER=${USERNAME}
 
+# In theory, this should not be necessary. We should be able to run home-manager
+# below with sudo and have it populate our home directory. However, this appear
+# to be broken.
+RUN sudo chown -R ${USERNAME}: /nix
 
-# Add unstable channel
-RUN source ~/.nix-profile/etc/profile.d/nix.sh && \
-    nix-channel --add https://nixos.org/channels/nixpkgs-unstable unstable && \
-    nix-channel --update
+WORKDIR /home/${USERNAME}
+COPY --chown=${USERNAME} . etc
 
-RUN echo "source ~/.nix-profile/etc/profile.d/nix.sh" >> ~/.profile && \
-    echo "source ~/.nix-profile/etc/profile.d/nix.sh" >> ~/.bashrc
+RUN nix run home-manager/release-24.05 -- switch --flake /home/${USERNAME}/etc#linux
 
-# Install zsh and starship via Nix
-RUN nix-env -iA nixpkgs.zsh nixpkgs.starship
+ENV TERM=xterm-direct
 
-# Setup starship configuration using flake
-COPY etc/dots /home/${USERNAME}/.config/dots
-RUN mkdir -p /home/${USERNAME}/.config && \
-    cd /home/${USERNAME}/.config/dots && \
-    source ~/.nix-profile/etc/profile.d/nix.sh && \
-    nix --experimental-features "nix-command flakes" build && \
-    mkdir -p /home/${USERNAME}/.config && \
-    cp result/starship.toml /home/${USERNAME}/.config/starship.toml && \
-    rm -f result && \
-    chown -R ${USERNAME}:${USERNAME} /home/${USERNAME}/.config
-
-# Create zsh config
-RUN echo '# Load Nix environment\n\
-if [ -e $HOME/.nix-profile/etc/profile.d/nix.sh ] ; then\n\
-    . $HOME/.nix-profile/etc/profile.d/nix.sh\n\
-fi\n\
-\n\
-# Initialize direnv\n\
-eval "$(direnv hook zsh)"\n\
-\n\
-# Initialize Starship prompt\n\
-eval "$(starship init zsh)"\n\
-\n\
-# Basic Zsh configuration\n\
-HISTFILE=~/.zsh_history\n\
-HISTSIZE=10000\n\
-SAVEHIST=10000\n\
-setopt appendhistory' > /home/${USERNAME}/.zshrc && \
-    chown ${USERNAME}:${USERNAME} /home/${USERNAME}/.zshrc
-
-ENTRYPOINT [ "/docker-entrypoint.sh" ]
-
-ONBUILD USER root
-
-# Arguments for username and user_uid and user_gid that can be changed
-ONBUILD ARG USERNAME=code
-ONBUILD ARG USER_UID=1000
-ONBUILD ARG USER_GID=${USER_UID}
-
-# onbuild uid and gid fixes
-ONBUILD RUN \
-    if [ -z ${USER_UID} ] || [ -z ${USER_UID} ] || [ -z ${USERNAME} ]; then exit 0; fi && \
-    set -x && \
-    if [ "$(id -u code)" != "${USER_UID}" ] || [ "$(id -g code)" != "${USER_GID}" ]; then \
-        groupmod -g ${USER_GID} -n ${USERNAME} code || true && \
-        usermod -u ${USER_UID} -g ${USER_GID} -l ${USERNAME} -m -d /home/${USERNAME} code && \
-        chown -R ${USER_UID}:${USER_GID} /nix && \
-        chown -R ${USER_UID}:${USER_GID} /home/${USERNAME} && \
-        echo ${USERNAME} ALL=\(root\) NOPASSWD:ALL > /etc/sudoers.d/devcontainer; \
-    fi
-
-ONBUILD USER ${USERNAME}
+CMD ${HOME}/.nix-profile/bin/zsh -l
