@@ -6,8 +6,8 @@ RUN apt-get update -y && \
     apt-get install -y curl locales sudo && \
     rm -rf /var/lib/apt/lists/*
 
-RUN useradd -m -U sykloid
-RUN echo "sykloid ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
+RUN useradd -m -U code
+RUN echo "code ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
 
 RUN sed -i '/en_US.UTF-8/s/^# //g' /etc/locale.gen && locale-gen
 RUN dpkg-reconfigure --frontend=noninteractive locales && update-locale LANG=en_US.UTF-8
@@ -36,10 +36,8 @@ ENV USER=${USERNAME}
 RUN sudo chown -R ${USERNAME}: /nix
 
 WORKDIR /home/${USERNAME}
-COPY --chown=${USERNAME} . etc
+COPY --chown=${USERNAME} ./dots dots
 
-RUN nix run home-manager/release-24.05 -- switch --flake /home/${USERNAME}/etc#linux
-
-ENV TERM=xterm-direct
+RUN nix run home-manager/release-24.05 -- switch --flake /home/${USERNAME}/dots#${USERNAME}
 
 CMD ${HOME}/.nix-profile/bin/zsh -l
