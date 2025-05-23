@@ -8,7 +8,7 @@
   inherit (lib) mkOption mkEnableOption types;
   inherit (lib) mkIf;
 
-  javascript = config.modules.languages.javascript;
+  cfg = config.modules.languages.javascript;
 in {
   options.modules.languages.javascript = mkLanguage {
     name = "Javascript";
@@ -43,18 +43,18 @@ in {
     };
   };
 
-  config = mkIf javascript.enable {
+  config = mkIf cfg.enable {
     home.packages = with pkgs;
       [
         # Always include the configured Node.js version
-        javascript.package
+        cfg.package
       ]
       # Add yarn if enabled
-      ++ lib.optional javascript.settings.yarn.enable javascript.settings.yarn.package
+      ++ lib.optional cfg.settings.yarn.enable cfg.settings.yarn.package
       # Add pnpm if enabled
-      ++ lib.optional javascript.settings.pnpm.enable javascript.settings.pnpm.package
+      ++ lib.optional cfg.settings.pnpm.enable cfg.settings.pnpm.package
       # Add bun if enabled
-      ++ lib.optional javascript.settings.bun.enable javascript.settings.bun.package;
+      ++ lib.optional cfg.settings.bun.enable cfg.settings.bun.package;
 
     # Node.js environment setup
     home.sessionVariables = {
