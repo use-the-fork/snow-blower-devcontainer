@@ -8,6 +8,7 @@ services:
         USER_GID: ${USER_GID:-1000}
     volumes:
       - ..:/workspace:cached
+      - ${HOME}/.ssh:/home/code/.ssh:ro
 
 volumes:
   docker:

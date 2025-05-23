@@ -21,8 +21,8 @@ RUN apt -y install --no-install-recommends \
     vim-tiny \
     nano \
     curl \
-    git \
-    ssh \
+    git \.vscode-server/extensions
+ssh \
     direnv \
     gnupg2 \
     iproute2 \
@@ -95,8 +95,6 @@ RUN sed -i "s/USER/${USERNAME}/" /home/${USERNAME}/.config/dots/flake.nix
 WORKDIR /home/${USERNAME}/.config/dots
 # RUN home-manager switch --flake .#${USERNAME}
 RUN nix run home-manager/release-24.05 -- switch --flake .#${USERNAME}
-
-ENV TERM=xterm-direct
 
 ENTRYPOINT [ "/docker-entrypoint.sh" ]
 
