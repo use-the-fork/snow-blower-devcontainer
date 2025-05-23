@@ -2,9 +2,7 @@
   pkgs,
   lib,
   ...
-}: let
-  # inherit (osConfig.modules.style.colorScheme) colors;
-in {
+}: {
   programs.fzf = {
     enable = true;
     defaultCommand = "${lib.getBin pkgs.fd}/bin/fd --type=f --hidden --exclude=.git";

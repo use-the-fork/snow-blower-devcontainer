@@ -4,7 +4,7 @@
   ...
 }: let
   inherit (lib) getExe;
-  inherit (pkgs) eza bat ripgrep dust procs python3;
+  inherit (pkgs) eza bat ripgrep dust procs;
 in {
   programs.zsh.shellAliases = {
     # make sudo use aliases

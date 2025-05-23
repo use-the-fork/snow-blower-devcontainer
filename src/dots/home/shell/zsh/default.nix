@@ -25,7 +25,6 @@
       syntaxHighlighting.enable = true;
 
       sessionVariables = {LC_ALL = "en_US.UTF-8";};
-
     };
   };
 }

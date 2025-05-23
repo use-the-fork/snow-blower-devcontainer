@@ -1,7 +1,4 @@
-{osConfig, ...}: let
-  inherit (osConfig) modules;
-  dev = modules.device;
-in {
+_: {
   programs.atuin = {
     enable = true;
     enableZshIntegration = true;
