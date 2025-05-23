@@ -1,17 +1,20 @@
 { pkgs, ... }:
 {
   # User-specific packages
-  home.packages = [
-    pkgs.any-nix-shell
-    pkgs.git
-    pkgs.direnv
+  home.packages = with pkgs; [
+    any-nix-shell
+    fzf
+    git
+    direnv
+    ripgrep
+    jq
+    rsync
+    fd
 
-    # pkgs.fd
-    # pkgs.fzf
+
     # pkgs.gawk
     # pkgs.gh
     # pkgs.gnused
-    # pkgs.jq
     # pkgs.less
     # pkgs.pure-prompt
     # pkgs.ripgrep

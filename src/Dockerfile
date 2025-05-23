@@ -96,6 +96,8 @@ WORKDIR /home/${USERNAME}/.config/dots
 # RUN home-manager switch --flake .#${USERNAME}
 RUN nix run home-manager/release-24.05 -- switch --flake .#${USERNAME}
 
+ENV TERM=xterm-direct
+
 ENTRYPOINT [ "/docker-entrypoint.sh" ]
 
 ONBUILD USER root

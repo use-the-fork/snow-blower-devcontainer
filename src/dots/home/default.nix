@@ -2,6 +2,7 @@
 
   imports = [ 
       ./shell
+      ./tools
       ./packages.nix
     ];
 

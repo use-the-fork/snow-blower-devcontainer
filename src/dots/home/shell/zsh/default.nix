@@ -4,7 +4,7 @@
   ...
 }: {
   imports = [
-    # ./aliases.nix
+    ./aliases.nix
     # ./init.nix
     # ./plugins.nix
   ];
