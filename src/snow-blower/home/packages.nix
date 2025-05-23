@@ -5,5 +5,6 @@
     jq
     rsync
     fd
+    nano
   ];
 }

@@ -11,7 +11,7 @@
     pkgs,
     ...
   }: let
-    user = config.snow-blower.user;
+    user = config.modules.user;
   in {
     legacyPackages = {
       homeConfigurations = {

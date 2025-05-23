@@ -1,7 +1,7 @@
 {lib, ...}: let
   inherit (lib) mkOption types;
 in {
-  options.snow-blower.user = {
+  options.modules.user = {
     username = mkOption {
       type = types.str;
       description = "The username for configuration";

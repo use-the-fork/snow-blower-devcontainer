@@ -1,8 +1,10 @@
 {config, ...}: {
   imports = [
+    ./languages
     ./shell
     ./tools
     ./packages.nix
+    ../snow-blower-config.nix
   ];
 
   config = {

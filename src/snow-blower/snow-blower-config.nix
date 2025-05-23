@@ -1,5 +1,9 @@
 {config, ...}: {
   config = {
-    snow-blower = {};
+    modules.languages = {
+      javascript = {
+        enable = true;
+      };
+    };
   };
 }

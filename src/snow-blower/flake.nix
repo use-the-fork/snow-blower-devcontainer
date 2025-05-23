@@ -34,7 +34,6 @@
         ./flake
         ./modules
         ./host.nix
-        ./snow-blower-config.nix
       ];
     };
 
