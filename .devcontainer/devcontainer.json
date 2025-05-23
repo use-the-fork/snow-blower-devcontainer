@@ -6,6 +6,23 @@
   "service": "dev",
   "workspaceFolder": "/workspace",
   // "userEnvProbe": "loginShell",
-  "updateRemoteUserUID": false
+  "updateRemoteUserUID": false,
+  "remoteUser": "code",
+  "shutdownAction": "stopCompose",
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "arrterian.nix-env-selector",
+        "jnoortheen.nix-ide",
+        "fsevenm.run-it-on",
+        "ms-azuretools.vscode-docker",
+        "yzhang.markdown-all-in-one"
+      ],
+      "settings": {
+        "terminal.integrated.defaultProfile.linux": "bash"
+      }
+    }
+  }
   // "onCreateCommand": "nix-shell --command 'echo done building nix dev environment'"
+  // "postStartCommand": "cd /workspaces/dev-container && nix develop -c /bin/bash -c \"echo 'Pre-loading complete!'\"",
 }

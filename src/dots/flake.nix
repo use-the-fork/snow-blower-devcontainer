@@ -12,7 +12,6 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-
     # Powered by
     flake-utils.url = "github:numtide/flake-utils";
 
@@ -21,14 +20,22 @@
   outputs = inputs@{self, nixpkgs, flake-utils, home-manager, ...}:
     flake-utils.lib.eachDefaultSystem (system: 
     let 
+        username = "USER";
         pkgs = import nixpkgs { inherit system; };
     in {
         legacyPackages = {
             homeConfigurations = {
-                "code" = home-manager.lib.homeManagerConfiguration {
+                "${username}" = home-manager.lib.homeManagerConfiguration {
                     inherit pkgs;
-
-                    modules = [ ./home ]; # Defined later
+                    modules = [ 
+                      {
+                        home = {
+                          username = "${username}";
+                          homeDirectory = "/home/${username}";
+                        };
+                      }
+                      ./home 
+                    ];
                 };
             };
         };

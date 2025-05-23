@@ -6,11 +6,11 @@
   inherit (lib.strings) concatStrings;
 in {
   config = {
-    home = {
-      sessionVariables = {
-        STARSHIP_CACHE = "${config.xdg.cacheHome}/starship";
-      };
-    };
+    # home = {
+    #   sessionVariables = {
+    #     STARSHIP_CACHE = "${config.xdg.cacheHome}/starship";
+    #   };
+    # };
 
     programs.starship = let
       elemsConcatted = concatStrings (
@@ -33,7 +33,6 @@ in {
 
       enableBashIntegration = true;
       enableZshIntegration = true;
-      enableNushellIntegration = true;
 
       settings = {
         scan_timeout = 2;

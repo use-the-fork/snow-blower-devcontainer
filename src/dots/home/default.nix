@@ -2,21 +2,15 @@
 
   imports = [ 
       ./shell
+      ./packages.nix
     ];
 
-  home = {
-
-        enableNixpkgsReleaseCheck = false;
-        username = "code";
-        homeDirectory = "/home/code";
-        stateVersion = "24.05";
-
-        sessionVariables = { };
-        # programs.home-manager.enable = true;
-
-      packages = [
-          pkgs.just
-      ];
-        
+  config = {
+    programs.home-manager.enable = true;
+    home = {
+            enableNixpkgsReleaseCheck = false;
+            stateVersion = "24.05";
+            sessionVariables = { };
+      };
   };
 }

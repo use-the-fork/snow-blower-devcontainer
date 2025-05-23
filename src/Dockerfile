@@ -1,9 +1,3 @@
-FROM golang:1.17 AS ext-preloader
-
-ADD ext-preloader /src
-WORKDIR /src
-RUN go build -o /ext-preloader main.go 
-
 FROM debian:stable-slim
 
 LABEL maintainer="use-the-fork <23747916+use-the-fork@users.noreply.github.com>"
@@ -57,12 +51,8 @@ RUN groupadd --gid ${USER_GID} ${USERNAME} && \
 COPY etc/nix.conf /etc/nix/nix.conf
 
 # install nix
-ARG NIX_INSTALL_SCRIPT=https://install.determinate.systems/nix
-RUN curl --proto '=https' --tlsv1.2 -sSf -L ${NIX_INSTALL_SCRIPT} | sudo -u ${USERNAME} NIX_INSTALLER_NO_MODIFY_PROFILE=1 sh -s -- install linux \
-  --extra-conf "sandbox = false" \
-  --extra-conf "filter-syscalls = false" \
-  --init none \
-  --no-confirm
+ARG NIX_INSTALL_SCRIPT=https://nixos.org/nix/install
+RUN curl -L ${NIX_INSTALL_SCRIPT} | sudo -u ${USERNAME} NIX_INSTALLER_NO_MODIFY_PROFILE=1 sh
 
 ENV PATH="${PATH}:/nix/var/nix/profiles/default/bin"
 
@@ -80,7 +70,6 @@ ENV ENV="/etc/envrc" BASH_ENV="/etc/envrc"
 COPY etc/direnv.toml /etc
 ENV DIRENV_CONFIG=/etc
 
-COPY --from=ext-preloader /ext-preloader /usr/bin/ext-preloader
 COPY docker-entrypoint.sh /docker-entrypoint.sh
 RUN chmod +x /docker-entrypoint.sh
 
@@ -89,15 +78,23 @@ RUN chmod +x /docker-entrypoint.sh
 # to be broken.
 RUN sudo chown -R ${USERNAME}: /nix
 
-
 # set defaut user, can be changed via ONBUILD triggers
 USER ${USERNAME}
 
 # Copy over our dot files and switch.
-COPY dots /home/${USERNAME}/dots
-RUN sudo chown -R ${USERNAME}: /home/${USERNAME}/dots
+COPY dots /home/${USERNAME}/.config/dots
+RUN sudo chown -R ${USERNAME}: /home/${USERNAME}/.config
 
-RUN nix run home-manager/release-24.05 -- switch --flake /home/${USERNAME}/dots#${USERNAME}
+# Fix user in flake
+RUN sed -i "s/USER/${USERNAME}/" /home/${USERNAME}/.config/dots/flake.nix
+
+# Install Home Manager as a package
+# RUN nix profile install nixpkgs#home-manager
+
+# switch to the flake package
+WORKDIR /home/${USERNAME}/.config/dots
+# RUN home-manager switch --flake .#${USERNAME}
+RUN nix run home-manager/release-24.05 -- switch --flake .#${USERNAME}
 
 ENTRYPOINT [ "/docker-entrypoint.sh" ]
 
@@ -113,11 +110,11 @@ ONBUILD RUN \
     if [ -z ${USER_UID} ] || [ -z ${USER_UID} ] || [ -z ${USERNAME} ]; then exit 0; fi && \
     set -x && \
     if [ "$(id -u code)" != "${USER_UID}" ] || [ "$(id -g code)" != "${USER_GID}" ]; then \
-        groupmod -g ${USER_GID} -n ${USERNAME} code || true && \
-        usermod -u ${USER_UID} -g ${USER_GID} -l ${USERNAME} -m -d /home/${USERNAME} code && \
-        chown -R ${USER_UID}:${USER_GID} /nix && \
-        chown -R ${USER_UID}:${USER_GID} /home/${USERNAME} && \
-        echo ${USERNAME} ALL=\(root\) NOPASSWD:ALL > /etc/sudoers.d/devcontainer; \
+    groupmod -g ${USER_GID} -n ${USERNAME} code || true && \
+    usermod -u ${USER_UID} -g ${USER_GID} -l ${USERNAME} -m -d /home/${USERNAME} code && \
+    chown -R ${USER_UID}:${USER_GID} /nix && \
+    chown -R ${USER_UID}:${USER_GID} /home/${USERNAME} && \
+    echo ${USERNAME} ALL=\(root\) NOPASSWD:ALL > /etc/sudoers.d/devcontainer; \
     fi
 
 ONBUILD USER ${USERNAME}
