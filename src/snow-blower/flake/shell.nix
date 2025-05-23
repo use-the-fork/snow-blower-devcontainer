@@ -7,12 +7,12 @@
     devShells.default = pkgs.mkShellNoCC {
       name = "snow-blower-devcontainer";
       meta.description = ''
-        FOO
+        Nix based devcontainer.
       '';
 
       # Set up pre-commit hooks when user enters the shell.
       shellHook = ''
-        ${config.pre-commit.installationScript}
+
       '';
 
       # Tell Direnv to shut up.

@@ -13,6 +13,8 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
+    treefmt-nix.url = "github:numtide/treefmt-nix";
+
     # Powered by
     flake-parts = {
       url = "github:hercules-ci/flake-parts";
