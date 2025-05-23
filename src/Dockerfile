@@ -82,22 +82,18 @@ RUN sudo chown -R ${USERNAME}: /nix
 USER ${USERNAME}
 
 # Copy over our dot files and switch.
-COPY dots /home/${USERNAME}/.config/dots
+COPY snow-blower /home/${USERNAME}/.config/snow-blower
 
-# AI: Like this AI?
-ARG CONFIG_NIX_PATH=dots/config.nix
-COPY ${CONFIG_NIX_PATH} /home/${USERNAME}/.config/dots/config.nix
+ARG SNOW_BLOWER_CONFIG_PATH=snow-blower/snow-blower-config.nix
+COPY ${SNOW_BLOWER_CONFIG_PATH} /home/${USERNAME}/.config/snow-blower/snow-blower-config.nix
 RUN sudo chown -R ${USERNAME}: /home/${USERNAME}/.config
-
-# Fix user in flake
-RUN sed -i "s/USER/${USERNAME}/" /home/${USERNAME}/.config/dots/flake.nix
 
 # Setup vscode
 RUN mkdir -p /home/${USERNAME}/.vscode-server/extensions && \
     mkdir -p /home/${USERNAME}/.vscode-server-insiders/extensions
 
 # switch to the flake package
-WORKDIR /home/${USERNAME}/.config/dots
+WORKDIR /home/${USERNAME}/.config/snow-blower
 # RUN home-manager switch --flake .#${USERNAME}
 RUN nix run home-manager/release-24.05 -- switch --flake .#${USERNAME}
 

@@ -4,4 +4,4 @@ FROM docker.io/use-the-fork/snow-blower-devcontainer:latest
 VOLUME /nix
 
 # Allow users to specify a custom config.nix path during build                                       
-ARG CONFIG_NIX_PATH=.devcontainer/config.nix
+# ARG SNOW_BLOWER_CONFIG_PATH=.devcontainer/snow-blower-config.nix

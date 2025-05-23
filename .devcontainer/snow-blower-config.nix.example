@@ -1,0 +1,13 @@
+{config, pkgs, ...}: {
+  config = {
+
+    snow-blower = {
+      user.username = "code"
+
+
+      # packages = with pkgs; [
+
+      # ];
+    };
+  };
+}

@@ -5,6 +5,7 @@
     # global, so they can be `.follow`ed
     systems.url = "github:nix-systems/default-linux";
 
+    # we build against unstable becuase why not?
     nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
 
     home-manager = {
@@ -13,8 +14,6 @@
     };
 
     # Powered by
-    flake-utils.url = "github:numtide/flake-utils";
-
     flake-parts = {
       url = "github:hercules-ci/flake-parts";
       inputs.nixpkgs-lib.follows = "nixpkgs";
@@ -30,37 +29,12 @@
       systems = import inputs.systems;
 
       imports = [
-        ./flake # Parts of the flake that are used to construct the final flake.
+        ./flake
+        ./modules
+        ./host.nix
+        ./snow-blower-config.nix
       ];
     };
-
-  # outputs = {
-  #   nixpkgs,
-  #   flake-utils,
-  #   home-manager,
-  #   ...
-  # }:
-  #   flake-utils.lib.eachDefaultSystem (system: let
-  #     username = "USER";
-  #     pkgs = import nixpkgs {inherit system;};
-  #   in {
-  #     legacyPackages = {
-  #       homeConfigurations = {
-  #         "${username}" = home-manager.lib.homeManagerConfiguration {
-  #           inherit pkgs;
-  #           modules = [
-  #             {
-  #               home = {
-  #                 username = "${username}";
-  #                 homeDirectory = "/home/${username}";
-  #               };
-  #             }
-  #             ./home
-  #           ];
-  #         };
-  #       };
-  #     };
-  #   });
 
   nixConfig = {
     extra-trusted-public-keys = [
