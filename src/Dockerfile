@@ -21,8 +21,8 @@ RUN apt -y install --no-install-recommends \
     vim-tiny \
     nano \
     curl \
-    git \.vscode-server/extensions
-ssh \
+    git \
+    ssh \
     direnv \
     gnupg2 \
     iproute2 \
