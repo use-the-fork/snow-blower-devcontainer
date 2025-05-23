@@ -88,8 +88,9 @@ RUN sudo chown -R ${USERNAME}: /home/${USERNAME}/.config
 # Fix user in flake
 RUN sed -i "s/USER/${USERNAME}/" /home/${USERNAME}/.config/dots/flake.nix
 
-# Install Home Manager as a package
-# RUN nix profile install nixpkgs#home-manager
+# Setup vscode
+RUN mkdir -p /home/${USERNAME}/.vscode-server/extensions && \
+    mkdir -p /home/${USERNAME}/.vscode-server-insiders/extensions
 
 # switch to the flake package
 WORKDIR /home/${USERNAME}/.config/dots

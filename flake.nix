@@ -8,6 +8,15 @@
 
     treefmt-nix.url = "github:numtide/treefmt-nix";
 
+    # guess what this does
+    # come on, try
+    git-hooks = {
+      url = "github:cachix/git-hooks.nix";
+      inputs = {
+        nixpkgs.follows = "nixpkgs";
+      };
+    };
+
     flake-parts = {
       url = "github:hercules-ci/flake-parts";
       inputs.nixpkgs-lib.follows = "nixpkgs";

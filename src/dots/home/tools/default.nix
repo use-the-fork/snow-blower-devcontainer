@@ -1,8 +1,8 @@
 {
   imports = [
     # ./bin
-    # ./git
-    
+    ./git
+
     ./atuin.nix
     ./bat.nix
     ./dircolors.nix
@@ -12,6 +12,5 @@
     ./fzf.nix
     ./ripgrep.nix
     ./zoxide.nix
-
   ];
 }
