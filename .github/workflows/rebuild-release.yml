@@ -40,7 +40,7 @@ jobs:
         uses: docker/metadata-action@v5
         with:
           images: |
-            use-the-fork/snow-blower-devcontainer
+            usethefork/snow-blower-devcontainer
             ghcr.io/${{ github.repository }} 
           tags: |
             type=raw,value=v1

@@ -83,6 +83,10 @@ USER ${USERNAME}
 
 # Copy over our dot files and switch.
 COPY dots /home/${USERNAME}/.config/dots
+
+# AI: Like this AI?
+ARG CONFIG_NIX_PATH=dots/config.nix
+COPY ${CONFIG_NIX_PATH} /home/${USERNAME}/.config/dots/config.nix
 RUN sudo chown -R ${USERNAME}: /home/${USERNAME}/.config
 
 # Fix user in flake
