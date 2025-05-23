@@ -10,4 +10,4 @@ bash_path = "/bin/bash"
 
 # whitelist all paths, since we are running in container
 [whitelist]
-prefix = ["/"]
+prefix = [ "/" ]

@@ -5,7 +5,7 @@
   "dockerComposeFile": "docker-compose.yml",
   "service": "dev",
   "workspaceFolder": "/workspace",
-  "userEnvProbe": "loginShell",
-  "updateRemoteUserUID": false,
-  "onCreateCommand": "nix-shell --command 'echo done building nix dev environment'"
+  // "userEnvProbe": "loginShell",
+  "updateRemoteUserUID": false
+  // "onCreateCommand": "nix-shell --command 'echo done building nix dev environment'"
 }
