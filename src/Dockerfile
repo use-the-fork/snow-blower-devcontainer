@@ -19,7 +19,6 @@ RUN apt -y install --no-install-recommends \
     less \
     xz-utils \
     vim-tiny \
-    nano \
     curl \
     git \
     ssh \
@@ -33,7 +32,8 @@ RUN apt -y install --no-install-recommends \
     locales \
     man-db \
     bash-completion \
-    acl
+    acl && \
+    rm -rf /var/lib/apt/lists/*
 
 # create at least locae for en_US.UTF-8
 RUN echo "en_US.UTF-8 UTF-8" >> /etc/locale.gen && locale-gen

@@ -5,8 +5,8 @@
 }: {
   imports = [
     ./aliases.nix
-    # ./init.nix
-    # ./plugins.nix
+    ./init.nix
+    ./plugins.nix
   ];
 
   config = {
